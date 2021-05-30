@@ -3,8 +3,10 @@ package com.abc.springboot.config;
 import com.abc.springboot.realm.MyRealm;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -56,8 +58,8 @@ public class ShiroConfig {
         filerchaimMap.put("login","anon");//配置登录请求不需要认证，anon表示某个请求不需要认证
         filerchaimMap.put("logout","logout");//配置登录的请求，登出后会清空当前用户的内存
 
-        filerchaimMap.put("/admin/**","authc,roles[admin]");//配置一个admin开头的所有请求需要登录 authc表示需要登录
-        filerchaimMap.put("/user/**","authc,roles[admin]");//配置一个user开头的所有请求需要登录 authc表示需要登录
+//        filerchaimMap.put("/admin/**","authc,roles[admin]");//配置一个admin开头的所有请求需要登录 authc表示需要登录
+//        filerchaimMap.put("/user/**","authc,roles[admin]");//配置一个user开头的所有请求需要登录 authc表示需要登录
 
         //配置剩下的所有请求都需要登录(注意这个必须写在最后!!!)
         //filerchaimMap.put("/**","authc");
@@ -66,5 +68,28 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filerchaimMap);
 
         return shiroFilterFactoryBean;
+    }
+
+    /**
+     * 开启shiro注解支持
+     * @return
+     */
+    @Bean
+    public DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator(){
+        DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        defaultAdvisorAutoProxyCreator.setProxyTargetClass(true);
+        return defaultAdvisorAutoProxyCreator;
+    }
+
+    /**
+     * 开启Aop的支持
+     * @param securityManager
+     * @return
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager){
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
     }
 }

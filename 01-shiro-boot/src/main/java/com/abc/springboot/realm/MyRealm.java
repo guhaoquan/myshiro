@@ -91,8 +91,15 @@ public class MyRealm extends AuthorizingRealm {
         if ("user".equals(obj)){
             roles.add("user");
         }
+        Set<String> permission = new HashSet<>();
+        //设置权限
+        if ("admin".equals(obj)){
+            //添加一个权限admin:add 只是一个命名风格表示admin下的add功能
+            permission.add("admin:add");
+        }
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.setRoles(roles);//设置角色信息
+        info.setStringPermissions(permission);
         return info;
     }
 }

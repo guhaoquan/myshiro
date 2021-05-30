@@ -2,9 +2,13 @@ package com.abc.springboot.controller;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -75,13 +79,41 @@ public class indexController {
         return "noPermission";
     }
 
+    /**
+     *@RequiresRoles 这个注解是shiro提供的，用于标签类或当前在访问是必须需要什么样的角色
+     * 属性
+     *  value取值为String 数组类型 用于指定访问时所需要的一个或多个角色名
+     *  logical 取值为logical,AND或Logical.OR,当指定多个角色时可以使用AND或OR一表示并且和或的意思默认值为AND
+     *          表示当前用户必须同时拥有多个角色才可以访问这个方法
+     * @return
+     */
+    @RequiresRoles(value = {"admin"})
     @RequestMapping("/admin/test")
     public @ResponseBody String adminTest(){
         return "AdminTest请求";
     }
 
+    @RequiresPermissions(value = "{admin:add}")
+    @RequiresRoles(value = "{admin}")
+    @RequestMapping("/admin/add")
+    public @ResponseBody String adminadd(){
+        return "Admin/add请求";
+    }
+
+    @RequiresRoles(value = "user")
     @RequestMapping("/user/test")
     public @ResponseBody String userTest(){
         return "userTest请求";
+    }
+
+    /**
+     * 配置自定义异常，需要拦截AuthorizationException异常或者ShiroException异常
+     * 注意：当前shiro出现权限验证失败以后会抛出异常，因此必须要写一个自定义的异常拦截
+     * @return
+     */
+    @ExceptionHandler(value = {AuthorizationException.class})
+    public String permissionError(Throwable throwable){
+        System.out.println("throwable"  + throwable);
+        return "noPermission";
     }
 }
