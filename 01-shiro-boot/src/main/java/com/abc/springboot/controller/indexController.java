@@ -20,6 +20,10 @@ public class indexController {
     public String login(String username, String password, Model model){
         //创建一个shiro的Subject对象，利用这个对象来完成用户的登录认证
         Subject subject = SecurityUtils.getSubject();
+
+        //退出解决缓存,进入这个请求用户一定是要完成用户登录功能,否则shiro会有缓存，否则shiro不会重新登录
+        subject.logout();
+
         //判断当前用户是否已经认证过，如果已经认证过着不需要认证如果没有认证过则进入if完成认证
         if (!subject.isAuthenticated()){
             //创建一个用户账号和密码的Token对象，并设置用户输入的账号和面
@@ -55,6 +59,9 @@ public class indexController {
 
     @RequestMapping("/logout")
     public String logout(){
+        Subject subject = SecurityUtils.getSubject();
+        //退出当前帐号，清空shiro当前用户的缓存，否则无法重新登录
+        subject.logout();
         return "redirect:/";
     }
 
