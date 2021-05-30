@@ -43,7 +43,7 @@ public class indexController {
                 model.addAttribute("errorMessage","帐号被锁定!");
                 return "login";
             }catch (IncorrectCredentialsException e){
-                //e.printStackTrace();
+                e.printStackTrace();
                 model.addAttribute("errorMessage","密码错误!");
                 return "login";
             }catch (AuthenticationException e){

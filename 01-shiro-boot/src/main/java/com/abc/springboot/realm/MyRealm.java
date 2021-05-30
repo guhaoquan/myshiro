@@ -2,14 +2,21 @@ package com.abc.springboot.realm;
 
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 自定义的Realm用来实现用户的认证和授权
  * 父类AuthenticatingRealm只支持用户认证(登录)
  */
-public class MyRealm extends AuthenticatingRealm {
+public class MyRealm extends AuthorizingRealm {
 
     /**
      * 用户认证的方法 这个方法不通手动调用shiro会自动调用
@@ -32,7 +39,7 @@ public class MyRealm extends AuthenticatingRealm {
         /**
          * 认证帐号
          */
-        if (!"admin".equals(username)&&!"lisi".equals(username)){
+        if (!"admin".equals(username)&&!"lisi".equals(username)&&!"user".equals(username)){
             throw new UnknownAccountException();//抛出帐号错误的异常
         }
         /**
@@ -63,7 +70,29 @@ public class MyRealm extends AuthenticatingRealm {
          * 参数3：为当前Realm的名字
          * 如果密码认证成功则返回一个用户身份对象，如果密码认证失败shiro会抛出异常
          */
-        return new SimpleAuthenticationInfo(username,"e10adc3949ba59abbe56e057f20f883e",getName());
+        return new SimpleAuthenticationInfo(username,"123456",getName());
     }
 
+    /**
+     * 用户授权的方法,当用户认证通过以后自动执行该方法
+     * @param principalCollection
+     * @return
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        System.out.println("------授权了----");
+        Object obj=principalCollection.getPrimaryPrincipal();//获取用户的帐号，根据帐号来从数据库中获取
+        Set<String> roles = new HashSet<String>();//定义用户角色的set集合这个集合应该来自数据库
+        //设置角色
+        if ("admin".equals(obj)){
+            roles.add("admin");
+            roles.add("user");
+        }
+        if ("user".equals(obj)){
+            roles.add("user");
+        }
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        info.setRoles(roles);//设置角色信息
+        return info;
+    }
 }

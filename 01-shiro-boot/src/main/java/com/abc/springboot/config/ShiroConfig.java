@@ -56,8 +56,8 @@ public class ShiroConfig {
         filerchaimMap.put("login","anon");//配置登录请求不需要认证，anon表示某个请求不需要认证
         filerchaimMap.put("logout","logout");//配置登录的请求，登出后会清空当前用户的内存
 
-        filerchaimMap.put("/admin/**","authc");//配置一个admin开头的所有请求需要登录 authc表示需要登录
-        filerchaimMap.put("/user/**","authc");//配置一个user开头的所有请求需要登录 authc表示需要登录
+        filerchaimMap.put("/admin/**","authc,roles[admin]");//配置一个admin开头的所有请求需要登录 authc表示需要登录
+        filerchaimMap.put("/user/**","authc,roles[admin]");//配置一个user开头的所有请求需要登录 authc表示需要登录
 
         //配置剩下的所有请求都需要登录(注意这个必须写在最后!!!)
         //filerchaimMap.put("/**","authc");
